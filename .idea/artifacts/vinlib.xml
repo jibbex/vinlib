@@ -1,0 +1,19 @@
+<component name="ArtifactManager">
+  <artifact type="jpackage" name="vinlib">
+    <output-path>$PROJECT_DIR$/out/artifacts/vinlib</output-path>
+    <properties id="jpackage-properties">
+      <options>
+        <option name="version" value="0.0.1" />
+        <option name="copyright" value="" />
+        <option name="description" value="" />
+        <option name="vendor" value="" />
+        <option name="mainClass" value="de.michm.vin.lib.Main" />
+      </options>
+    </properties>
+    <root id="root">
+      <element id="archive" name="vinlib.jar">
+        <element id="module-output" name="vinlib" />
+      </element>
+    </root>
+  </artifact>
+</component>
