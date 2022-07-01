@@ -7,12 +7,20 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#undef de_michm_vin_lib_Mouse_LEFT_BUTTON
-#define de_michm_vin_lib_Mouse_LEFT_BUTTON 0L
-#undef de_michm_vin_lib_Mouse_RIGHT_BUTTON
-#define de_michm_vin_lib_Mouse_RIGHT_BUTTON 1L
-#undef de_michm_vin_lib_Mouse_MIDDLE_BUTTON
-#define de_michm_vin_lib_Mouse_MIDDLE_BUTTON 2L
+#undef de_michm_vin_lib_Mouse_CLICK_DURATION
+#define de_michm_vin_lib_Mouse_CLICK_DURATION 300L
+#undef de_michm_vin_lib_Mouse_LEFT_DOWN
+#define de_michm_vin_lib_Mouse_LEFT_DOWN 2i64
+#undef de_michm_vin_lib_Mouse_LEFT_UP
+#define de_michm_vin_lib_Mouse_LEFT_UP 4i64
+#undef de_michm_vin_lib_Mouse_RIGHT_DOWN
+#define de_michm_vin_lib_Mouse_RIGHT_DOWN 8i64
+#undef de_michm_vin_lib_Mouse_RIGHT_UP
+#define de_michm_vin_lib_Mouse_RIGHT_UP 16i64
+#undef de_michm_vin_lib_Mouse_MIDDLE_DOWN
+#define de_michm_vin_lib_Mouse_MIDDLE_DOWN 32i64
+#undef de_michm_vin_lib_Mouse_MIDDLE_UP
+#define de_michm_vin_lib_Mouse_MIDDLE_UP 64i64
 /*
  * Class:     de_michm_vin_lib_Mouse
  * Method:    move
@@ -23,11 +31,19 @@ JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_move
 
 /*
  * Class:     de_michm_vin_lib_Mouse
- * Method:    click
- * Signature: (I)V
+ * Method:    moveTo
+ * Signature: (JJ)V
  */
-JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_click
-  (JNIEnv *, jobject, jint);
+JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_moveTo
+  (JNIEnv *, jobject, jlong, jlong);
+
+/*
+ * Class:     de_michm_vin_lib_Mouse
+ * Method:    nativeClick
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_nativeClick
+  (JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus
 }

@@ -2,38 +2,41 @@ package de.michm.vin.lib;
 
 import java.util.Scanner;
 
-public class Main {
+public class Test {
     public static void main(String[] args) {
         boolean run = true;
+        boolean abs = false;
         Scanner scanner = new Scanner(System.in);
         Mouse mouse = new Mouse();
 
         printHelp();
 
         while (run) {
-            System.out.print(" > ");
+            System.out.print("> ");
             String input = scanner.nextLine();
 
             if (input.equalsIgnoreCase("q")) {
                 run = false;
-            } else if (input.matches("^-?\\d+, ?-?\\d+$")) {
+            } else if (!abs && input.matches("^-?\\d+, ?-?\\d+$")) {
                 Point point = new Point(input);
                 mouse.move(point.getX(), point.getY());
+            } else if (abs && input.matches("^-?\\d+, ?-?\\d+$")) {
+                Point point = new Point(input);
+                mouse.moveTo(point.getX(), point.getY());
             } else if (input.matches("^click .+$")) {
-                int button = -1;
                 String btnIn = input.substring(input.indexOf(' ') + 1);
 
                 if (btnIn.equalsIgnoreCase("left")) {
-                    button = Mouse.LEFT_BUTTON;
+                    mouse.click();
                 } else if (btnIn.equalsIgnoreCase("right")) {
-                    button = Mouse.RIGHT_BUTTON;
+                    mouse.click(Mouse.RIGHT_DOWN);
                 } else if (btnIn.equalsIgnoreCase("middle")) {
-                    button = Mouse.MIDDLE_BUTTON;
+                    mouse.click(Mouse.MIDDLE_DOWN);
                 }
-
-                if (button >= 0) {
-                    mouse.click(button);
-                }
+            } else if (input.toLowerCase().startsWith("abs ")) {
+                abs = input.toLowerCase().endsWith(" true");
+            } else if (input.equalsIgnoreCase("abs")) {
+                System.out.printf("abs: %s\n", abs);
             }
         }
 
@@ -41,10 +44,12 @@ public class Main {
     }
 
     private static void printHelp() {
-        System.out.println("Enter coordinates to which the cursor should move. [x, y]");
-        System.out.println("\te.g.: 120, 80\n");
+        System.out.println("\nEnter coordinates to which the cursor should move. [x, y]");
+        System.out.println("e.g.: 120, 80\n");
         System.out.println("Enter click <left|right|middle> to click with the");
         System.out.println("specified mouse button.\n");
+        System.out.println("Enter abs <true|false> to toggle move mode");
+        System.out.println("between absolute to screen size and relative to position.\n");
         System.out.println("Hit \"q\" to quit.\n");
     }
 
