@@ -45,6 +45,22 @@ JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_moveTo
 JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_nativeClick
   (JNIEnv *, jobject, jlong);
 
+/*
+ * Class:     de_michm_vin_lib_Mouse
+ * Method:    hook
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_hook
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     de_michm_vin_lib_Mouse
+ * Method:    unhook
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_unhook
+  (JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif

@@ -1,7 +1,5 @@
 package de.michm.vin.lib;
 
-import de.michm.vin.lib.MouseWinProc;
-
 public class Mouse {
     final private static int CLICK_DURATION = 300;
     final public static long LEFT_DOWN = 0x0002;
@@ -10,7 +8,7 @@ public class Mouse {
     final public static long RIGHT_UP = 0x0010;
     final public static long MIDDLE_DOWN = 0x0020;
     final public static long MIDDLE_UP = 0x0040;
-    public MouseWinProc proc;
+    private MouseWinProc proc;
 
     static {
         System.loadLibrary("vinlib");
