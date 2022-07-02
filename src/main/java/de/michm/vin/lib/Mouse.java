@@ -1,5 +1,7 @@
 package de.michm.vin.lib;
 
+import de.michm.vin.lib.MouseWinProc;
+
 public class Mouse {
     final private static int CLICK_DURATION = 300;
     final public static long LEFT_DOWN = 0x0002;
@@ -8,6 +10,7 @@ public class Mouse {
     final public static long RIGHT_UP = 0x0010;
     final public static long MIDDLE_DOWN = 0x0020;
     final public static long MIDDLE_UP = 0x0040;
+    public MouseWinProc proc;
 
     static {
         System.loadLibrary("vinlib");
@@ -65,4 +68,34 @@ public class Mouse {
      *               MIDDLE_DOWN, MIDDLE_UP
      */
     private native void nativeClick(long button);
+
+    /**
+     * Creates a low level mouse hook. The callback will
+     * be called if a message was received.
+     * @param proc
+     */
+    protected void hook(MouseWinProc proc) {
+        this.proc = proc;
+        hook();
+    }
+
+    /**
+     * Creates a low level mouse hook.
+     */
+    private native void hook();
+
+    /**
+     * Unhooks callback from the low level mouse hook.
+     */
+    protected native void unhook();
+
+    /**
+     * Is called from native context.
+     * @param x
+     * @param y
+     * @param button
+     */
+    protected void event(long x, long y, long button) {
+        proc.callback(x, y, button);
+    }
 }
