@@ -1,4 +1,5 @@
-#include "hook.h"
+#include "vinlib.h"
+#include <jni.h>
 
 using namespace std;
 
@@ -14,9 +15,13 @@ int Hook::Messsages() {
     return (int)Hook::Instance().msg.wParam;
 }
 
-void Hook::InstallHook() {
+void Hook::InstallHook(JNIEnv* env, jobject jobj, jmethodID callback) {
     if (!(Hook::Instance().hook = SetWindowsHookEx(WH_MOUSE_LL, MouseCallback, NULL, 0))) {
-        MessageBox(NULL, L"Could not Install HOOK.", L"SetWindowsHookEx", MB_OK | MB_ICONWARNING);
+        MessageBox(NULL, LPCSTR("Could not Install HOOK."), LPCSTR("SetWindowsHookEx"), MB_OK | MB_ICONWARNING);
+    } else {
+        Hook::Instance().env = env;
+        Hook::Instance().obj = jobj;
+        Hook::Instance().callback = callback;
     }
 }
 
@@ -25,6 +30,7 @@ void Hook::UninstallHook() {
 }
 
 LRESULT WINAPI MouseCallback(int nCode, WPARAM wParam, LPARAM lParam) {
+    long button = -1;
     MSLLHOOKSTRUCT* pMouseStruct = (MSLLHOOKSTRUCT*)lParam;
 
     if (nCode >= 0) {
@@ -34,12 +40,22 @@ LRESULT WINAPI MouseCallback(int nCode, WPARAM wParam, LPARAM lParam) {
 
         switch (wParam) {
             case WM_LBUTTONUP:
-                printf_s("LEFT CLICK UP\n");
+                button = 0x0002;
                 break;
             case WM_LBUTTONDOWN:
-                printf_s("LEFT CLICK DOWN\n");
-                 break;
+                button = 0x0008;
+                break;
         }
+
+        JNIEnv* env = Hook::Instance().env;
+
+        (*env).CallVoidMethod(
+            Hook::Instance().obj,
+            Hook::Instance().callback,
+            (jlong) pMouseStruct->pt.x,
+            (jlong) pMouseStruct->pt.y,
+            (jlong) button
+        );
     }
 
     return CallNextHookEx(Hook::Instance().hook, nCode, wParam, lParam);
