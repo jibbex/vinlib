@@ -1,8 +1,4 @@
 #pragma once
-#include <Windows.h>
-#include <iostream>
-#incldue "de_michm_vin_lib_Mouse.h"
-
 
 using namespace std;
 
@@ -15,13 +11,13 @@ class Hook {
 
     HHOOK hook;
     MSLLHOOKSTRUCT mouseStruct;
-    void InstallHook(JMethod callback);
+    void InstallHook(JNIEnv*, jobject, jmethodID);
     void UninstallHook();
 
     MSG msg;
     int Messsages();
-    JMethod callback;
-    JNIenv* env;
+    jmethodID callback;
+    JNIEnv* env;
     jobject obj;
 };
 
