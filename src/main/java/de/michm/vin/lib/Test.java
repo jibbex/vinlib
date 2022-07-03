@@ -22,9 +22,10 @@ public class Test {
             } else if (!abs && input.matches("^-?\\d+, ?-?\\d+$")) {
                 Point point = new Point(input);
                 mouse.move(point.getX(), point.getY());
+                //mouse.moveTo(point.getX(), point.getY(), 1f);
             } else if (abs && input.matches("^-?\\d+, ?-?\\d+$")) {
                 Point point = new Point(input);
-                mouse.moveTo(point.getX(), point.getY());
+                mouse.moveAbs(point.getX(), point.getY());
             } else if (input.matches("^click .+$") || input.equalsIgnoreCase("click")) {
                 String btnIn = input.substring(input.indexOf(' ') + 1);
 

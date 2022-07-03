@@ -31,11 +31,19 @@ JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_move
 
 /*
  * Class:     de_michm_vin_lib_Mouse
- * Method:    moveTo
+ * Method:    moveAbs
  * Signature: (JJ)V
  */
-JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_moveTo
+JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_moveAbs
   (JNIEnv *, jobject, jlong, jlong);
+
+/*
+ * Class:     de_michm_vin_lib_Mouse
+ * Method:    moveTo
+ * Signature: (JJF)V
+ */
+JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_moveTo
+  (JNIEnv *, jobject, jlong, jlong, jfloat);
 
 /*
  * Class:     de_michm_vin_lib_Mouse
