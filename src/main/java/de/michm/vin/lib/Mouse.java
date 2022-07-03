@@ -24,11 +24,33 @@ public class Mouse {
 
     /**
      * Moves the mouse cursor absolute to the
+     * screen size along x and y-axis. Interpolates
+     * the values between start- and endpoint.
+     * @param x long value of x-axis position
+     * @param y long value of y-axis position
+     * @param speed float value of movement speed
+     */
+    protected void move(long x, long y, float speed) {
+        moveTo(x, y, speed);
+    }
+
+    /**
+     * Moves the mouse cursor absolute to the
      * screen size along x and y-axis.
      * @param x long value of x-axis position
      * @param y long value of y-axis position
      */
-    protected native void moveTo(long x, long y);
+    protected native void moveAbs(long x, long y);
+
+    /**
+     * Moves the mouse cursor absolute to the
+     * screen size along x and y-axis. Interpolates
+     * the values between start- and endpoint.
+     * @param x long value of x-axis position
+     * @param y long value of y-axis position
+     * @param speed float value of movement speed
+     */
+    protected native void moveTo(long x, long y, float speed);
 
     /**
      * Sends left click event to the operating system.
