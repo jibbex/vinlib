@@ -1,98 +1,78 @@
 package de.michm.vin.lib;
 
-import java.io.IOException;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Scanner;
 
 public class Test {
-    public static void main(String[] args) throws  IOException {
-        Thread thread = null;
+    public static void main(String[] args) {
+        int[] stops = { 0, 0, 0, 0};
+        int iterations = 0;
         boolean run = true;
         boolean abs = false;
-        boolean pos = false;
-        boolean isIndicating = false;
-        final NbBufferedReader reader = new NbBufferedReader(System.in);
-        AtomicReference<Point> oldPt = new AtomicReference<>(new Point(-1,1));
-        AtomicReference<Point> pt = new AtomicReference<>(new Point(-1, -1));
-
-        String input = null;
+        Scanner scanner = new Scanner(System.in);
         Mouse mouse = new Mouse();
 
         printHelp();
 
         while (run) {
-            if (!isIndicating) {
-                isIndicating = true;
-                System.out.print("> ");
-            }
-            input = reader.readLine();
+            System.out.print("> ");
+            String input = scanner.nextLine();
 
-            if (input != null) {
-                isIndicating = false;
+            if (input.equalsIgnoreCase("q")) {
+                run = false;
+            } else if (!abs && input.matches("^-?\\d+, ?-?\\d+$")) {
+                Point point = new Point(input);
+                mouse.move(point.getX(), point.getY());
+                //mouse.moveTo(point.getX(), point.getY(), 1f);
+            } else if (abs && input.matches("^-?\\d+, ?-?\\d+$")) {
+                Point point = new Point(input);
+                mouse.moveAbs(point.getX(), point.getY());
+            } else if (input.matches("^click .+$") || input.equalsIgnoreCase("click")) {
+                String btnIn = input.substring(input.indexOf(' ') + 1);
 
-                if (input.equalsIgnoreCase("q")) {
-                    run = false;
-                } else if (!abs && input.matches("^-?\\d+, ?-?\\d+$")) {
-                    Point point = new Point(input);
-                    mouse.move(point.getX(), point.getY());
-                    //mouse.moveTo(point.getX(), point.getY(), 1f);
-                } else if (abs && input.matches("^-?\\d+, ?-?\\d+$")) {
-                    Point point = new Point(input);
-                    mouse.moveABS(point.getX(), point.getY());
-                } else if (input.matches("^click .+$") || input.equalsIgnoreCase("click")) {
-                    String btnIn = input.substring(input.indexOf(' ') + 1);
-
-                    if (btnIn.equalsIgnoreCase("left") || btnIn.equalsIgnoreCase("click")) {
-                        mouse.click();
-                    } else if (btnIn.equalsIgnoreCase("right")) {
-                        mouse.click(Mouse.RIGHT_DOWN);
-                    } else if (btnIn.equalsIgnoreCase("middle")) {
-                        mouse.click(Mouse.MIDDLE_DOWN);
-                    }
-                } else if (input.toLowerCase().startsWith("abs ")) {
-                    abs = input.toLowerCase().endsWith(" true");
-                } else if (input.equalsIgnoreCase("abs")) {
-                    System.out.printf("abs: %s\n", abs);
-                } else if (input.equals("pos") || input.equals("p")) {
-                    pos = !pos;
-
-                    if (pos) {
-                        thread = new Thread(() -> {
-                            while (true) {
-                                mouse.getCursorPos((long x, long y, long button) -> {
-                                    try {
-                                        pt.set(new Point(x, y));
-                                        Thread.sleep(250);
-                                    } catch (Exception e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                });
-                            }
-                        });
-
-                        thread.setDaemon(true);
-                        thread.start();
-                    }
-                } else if (input.equals("help")) {
-                    printHelp();
+                if (btnIn.equalsIgnoreCase("left") || btnIn.equalsIgnoreCase("click")) {
+                    mouse.click();
+                } else if (btnIn.equalsIgnoreCase("right")) {
+                    mouse.click(Mouse.RIGHT_DOWN);
+                } else if (btnIn.equalsIgnoreCase("middle")) {
+                    mouse.click(Mouse.MIDDLE_DOWN);
                 }
+            } else if (input.toLowerCase().startsWith("abs ")) {
+                abs = input.toLowerCase().endsWith(" true");
+            } else if (input.equalsIgnoreCase("abs")) {
+                System.out.printf("abs: %s\n", abs);
+            } else if (input.matches("^circle .+$")) {
+                String iterIn = input.substring(input.indexOf(' ') + 1);
+                iterations = Integer.parseInt(iterIn);
+
+                stops = new int[]{
+                        iterations,
+                        iterations / 2,
+                        iterations / 3,
+                        iterations / 4,
+                };
+
             }
 
-            boolean hasChanged = oldPt.get().getX() != pt.get().getX() || oldPt.get().getY() != pt.get().getY();
-
-            if (hasChanged && pt.get().getX() != -1 && pt.get().getY() != -1) {
-                System.out.printf("x: %s, y: %s\n", pt.get().getX(), pt.get().getY());
-                oldPt.set(pt.get());
-            }
-
-            if (thread != null && input != null && input.isEmpty()) {
-                pos = false;
-                thread.interrupt();
-                thread = null;
-                pt.set(new Point(-1,-1));
+            if (iterations > 0) {
+                if (iterations >= stops[0]) {
+                    mouse.move(-5, -5);
+                } else if (iterations >= stops[1]) {
+                    mouse.move(5, -5);
+                } else if (iterations >= stops[2]) {
+                    mouse.move(-5, 5);
+                } else {
+                    mouse.move(-5, -5);
+                }
+                iterations--;
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
-        reader.close();
+        scanner.close();
     }
 
     private static void printHelp() {
@@ -118,11 +98,6 @@ public class Test {
 
             x = Long.parseLong(pointX);
             y = Long.parseLong(pointY);
-        }
-
-        Point(long x, long y) {
-            this.x = x;
-            this.y = y;
         }
 
         public long getX() {
