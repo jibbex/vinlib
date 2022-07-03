@@ -13,6 +13,10 @@ public class Test {
 
         printHelp();
 
+        mouse.hook((long x, long y, long button) -> {
+            System.out.printf("x: %s, y: %s, button: %s\n", x, y, button);
+        });
+
         while (run) {
             System.out.print("> ");
             String input = scanner.nextLine();
