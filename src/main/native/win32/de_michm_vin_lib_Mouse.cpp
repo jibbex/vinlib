@@ -82,3 +82,10 @@ JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_nativeClick(JNIEnv *env, jobj
 
     SendInput(ARRAYSIZE(inputs), inputs, sizeof(INPUT));
 }
+
+JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_hook(JNIEnv *env, jobject jobj) {
+    jclass mouseClass = (*env).GetObjectClass(jobj);
+    jmethodID callback = (*env).GetMethodID(mouseClass, "event", "(JJJ)V");
+
+    Hook::Instance().InstallHook(env, jobj, callback);
+}
