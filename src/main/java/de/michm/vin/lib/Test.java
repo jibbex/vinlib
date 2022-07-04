@@ -3,23 +3,26 @@ package de.michm.vin.lib;
 import java.util.Scanner;
 
 public class Test {
-    public static void main(String[] args) {
-        int[] stops = { 0, 0, 0, 0};
-        int iterations = 0;
+    public static void main(String[] args) throws InterruptedException {
         boolean run = true;
         boolean abs = false;
-        Scanner scanner = new Scanner(System.in);
+        boolean pos = false;
+
+        final Scanner scanner = new Scanner(System.in);
+        String input = "";
         Mouse mouse = new Mouse();
 
         printHelp();
 
-        mouse.hook((long x, long y, long button) -> {
-            System.out.printf("x: %s, y: %s, button: %s\n", x, y, button);
-        });
-
         while (run) {
-            System.out.print("> ");
-            String input = scanner.nextLine();
+            if (pos) {
+                input = "";
+                mouse.getCursorPos((long x, long y, long button) -> System.out.printf("x: %s, y: %s, button: %s\n", x, y, button));
+                Thread.sleep(1000);
+            } else {
+                System.out.print("> ");
+                input = scanner.nextLine();
+            }
 
             if (input.equalsIgnoreCase("q")) {
                 run = false;
@@ -29,7 +32,7 @@ public class Test {
                 //mouse.moveTo(point.getX(), point.getY(), 1f);
             } else if (abs && input.matches("^-?\\d+, ?-?\\d+$")) {
                 Point point = new Point(input);
-                mouse.moveAbs(point.getX(), point.getY());
+                mouse.moveABS(point.getX(), point.getY());
             } else if (input.matches("^click .+$") || input.equalsIgnoreCase("click")) {
                 String btnIn = input.substring(input.indexOf(' ') + 1);
 
@@ -44,38 +47,10 @@ public class Test {
                 abs = input.toLowerCase().endsWith(" true");
             } else if (input.equalsIgnoreCase("abs")) {
                 System.out.printf("abs: %s\n", abs);
-            } else if (input.matches("^circle .+$")) {
-                String iterIn = input.substring(input.indexOf(' ') + 1);
-                iterations = Integer.parseInt(iterIn);
-
-                stops = new int[]{
-                        iterations,
-                        iterations / 2,
-                        iterations / 3,
-                        iterations / 4,
-                };
-
-            }
-
-            if (iterations > 0) {
-                if (iterations >= stops[0]) {
-                    mouse.move(-5, -5);
-                } else if (iterations >= stops[1]) {
-                    mouse.move(5, -5);
-                } else if (iterations >= stops[2]) {
-                    mouse.move(-5, 5);
-                } else {
-                    mouse.move(-5, -5);
-                }
-                iterations--;
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            } else if (input.equals("pos")) {
+                pos = !pos;
             }
         }
-
         scanner.close();
     }
 

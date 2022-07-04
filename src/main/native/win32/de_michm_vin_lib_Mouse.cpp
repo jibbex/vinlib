@@ -20,8 +20,8 @@ JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_moveAbs(JNIEnv *env, jobject 
 
     inputs[0].type = INPUT_MOUSE;
     inputs[0].mi.dwFlags = MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
-    inputs[0].mi.dx = ((long) x) * 0.01;
-    inputs[0].mi.dy = ((long) y) * 0.01;
+    inputs[0].mi.dx = (long) x;
+    inputs[0].mi.dy = (long) y;
 
     SendInput(ARRAYSIZE(inputs), inputs, sizeof(INPUT));
 }
@@ -88,4 +88,15 @@ JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_hook(JNIEnv *env, jobject job
     jmethodID callback = (*env).GetMethodID(mouseClass, "event", "(JJJ)V");
 
     Hook::Instance().InstallHook(env, jobj, callback);
+}
+
+JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_getCursorPos(JNIEnv *env, jobject obj) {
+    LPPOINT pt;
+
+    if (GetCursorPos(pt)) {
+        jclass mouseClass = (*env).GetObjectClass(obj);
+        jmethodID callback = (*env).GetMethodID(mouseClass, "event", "(JJJ)V");
+
+        (*env).CallVoidMethod(obj,callback,(jlong) pt->x, (jlong) pt->y, (jlong) -1);
+    }
 }
