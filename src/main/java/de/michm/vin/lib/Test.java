@@ -3,6 +3,7 @@ package de.michm.vin.lib;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Test {
     public static void main(String[] args) throws  IOException {
@@ -12,7 +13,7 @@ public class Test {
         boolean pos = false;
         final BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
         final NbBufferedReader reader = new NbBufferedReader(stdin);
-
+        AtomicReference<Point> pt = new AtomicReference<>(new Point(-1, -1));
 
         String input = null;
         Mouse mouse = new Mouse();
@@ -46,14 +47,16 @@ public class Test {
                     abs = input.toLowerCase().endsWith(" true");
                 } else if (input.equalsIgnoreCase("abs")) {
                     System.out.printf("abs: %s\n", abs);
-                } else if (input.equals("pos")) {
+                } else if (input.equals("pos") || input.equals("p")) {
                     pos = !pos;
 
                     if (pos) {
                         thread = new Thread(() -> {
                             while (true) {
-                                mouse.getCursorPos((long x, long y, long button) -> System.out.printf("x: %s, y: %s, button: %s\n", x, y, button));
                                 try {
+                                    mouse.getCursorPos((long x, long y, long button) -> {
+                                        pt.set(new Point(x, y));
+                                    });
                                     Thread.sleep(500);
                                 } catch (InterruptedException e) {
                                     throw new RuntimeException(e);
@@ -67,8 +70,13 @@ public class Test {
                     } else if (thread != null) {
                         thread.interrupt();
                         thread = null;
+                        pt.set(new Point(-1,-1));
                     }
                 }
+            }
+
+            if (pt.get().getX() != -1 && pt.get().getY() != -1) {
+                System.out.printf("x: %s, y: %s\n", pt.get().getX(), pt.get().getY());
             }
         }
 
