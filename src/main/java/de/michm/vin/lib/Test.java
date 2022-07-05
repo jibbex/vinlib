@@ -1,57 +1,58 @@
 package de.michm.vin.lib;
 
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class Test {
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws  IOException {
         boolean run = true;
         boolean abs = false;
-        boolean pos = false;
+        boolean pos = false;        
+        final BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+        final NbBufferedReader reader = new NbBufferedReader(stdin);
 
-        final Scanner scanner = new Scanner(System.in);
-        String input = "";
+        String input = null;
         Mouse mouse = new Mouse();
 
         printHelp();
 
         while (run) {
-            if (pos) {
-                input = "";
-                mouse.getCursorPos((long x, long y, long button) -> System.out.printf("x: %s, y: %s, button: %s\n", x, y, button));
-                Thread.sleep(1000);
-            } else {
-                System.out.print("> ");
-                input = scanner.nextLine();
-            }
+            input = reader.readLine();
 
-            if (input.equalsIgnoreCase("q")) {
-                run = false;
-            } else if (!abs && input.matches("^-?\\d+, ?-?\\d+$")) {
-                Point point = new Point(input);
-                mouse.move(point.getX(), point.getY());
-                //mouse.moveTo(point.getX(), point.getY(), 1f);
-            } else if (abs && input.matches("^-?\\d+, ?-?\\d+$")) {
-                Point point = new Point(input);
-                mouse.moveABS(point.getX(), point.getY());
-            } else if (input.matches("^click .+$") || input.equalsIgnoreCase("click")) {
-                String btnIn = input.substring(input.indexOf(' ') + 1);
+            if (input != null) {
+                if (input.equalsIgnoreCase("q")) {
+                    run = false;
+                } else if (!abs && input.matches("^-?\\d+, ?-?\\d+$")) {
+                    Point point = new Point(input);
+                    mouse.move(point.getX(), point.getY());
+                    //mouse.moveTo(point.getX(), point.getY(), 1f);
+                } else if (abs && input.matches("^-?\\d+, ?-?\\d+$")) {
+                    Point point = new Point(input);
+                    mouse.moveABS(point.getX(), point.getY());
+                } else if (input.matches("^click .+$") || input.equalsIgnoreCase("click")) {
+                    String btnIn = input.substring(input.indexOf(' ') + 1);
 
-                if (btnIn.equalsIgnoreCase("left") || btnIn.equalsIgnoreCase("click")) {
-                    mouse.click();
-                } else if (btnIn.equalsIgnoreCase("right")) {
-                    mouse.click(Mouse.RIGHT_DOWN);
-                } else if (btnIn.equalsIgnoreCase("middle")) {
-                    mouse.click(Mouse.MIDDLE_DOWN);
+                    if (btnIn.equalsIgnoreCase("left") || btnIn.equalsIgnoreCase("click")) {
+                        mouse.click();
+                    } else if (btnIn.equalsIgnoreCase("right")) {
+                        mouse.click(Mouse.RIGHT_DOWN);
+                    } else if (btnIn.equalsIgnoreCase("middle")) {
+                        mouse.click(Mouse.MIDDLE_DOWN);
+                    }
+                } else if (input.toLowerCase().startsWith("abs ")) {
+                    abs = input.toLowerCase().endsWith(" true");
+                } else if (input.equalsIgnoreCase("abs")) {
+                    System.out.printf("abs: %s\n", abs);
+                } else if (input.equals("pos")) {
+                    pos = !pos;
                 }
-            } else if (input.toLowerCase().startsWith("abs ")) {
-                abs = input.toLowerCase().endsWith(" true");
-            } else if (input.equalsIgnoreCase("abs")) {
-                System.out.printf("abs: %s\n", abs);
-            } else if (input.equals("pos")) {
-                pos = !pos;
+            } else if (!reader.isReady()) {
+                mouse.getCursorPos((long x, long y, long button) -> System.out.printf("x: %s, y: %s, button: %s\n", x, y, button));
             }
         }
-        scanner.close();
+
+        reader.close();
     }
 
     private static void printHelp() {
