@@ -6,11 +6,13 @@ import java.io.InputStreamReader;
 
 public class Test {
     public static void main(String[] args) throws  IOException {
+        Thread thread = null;
         boolean run = true;
         boolean abs = false;
-        boolean pos = false;        
+        boolean pos = false;
         final BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
         final NbBufferedReader reader = new NbBufferedReader(stdin);
+
 
         String input = null;
         Mouse mouse = new Mouse();
@@ -46,9 +48,27 @@ public class Test {
                     System.out.printf("abs: %s\n", abs);
                 } else if (input.equals("pos")) {
                     pos = !pos;
+
+                    if (pos) {
+                        thread = new Thread(() -> {
+                            while (true) {
+                                mouse.getCursorPos((long x, long y, long button) -> System.out.printf("x: %s, y: %s, button: %s\n", x, y, button));
+                                try {
+                                    Thread.sleep(500);
+                                } catch (InterruptedException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+
+                        });
+
+                        thread.setDaemon(true);
+                        thread.start();
+                    } else if (thread != null) {
+                        thread.interrupt();
+                        thread = null;
+                    }
                 }
-            } else if (!reader.isReady()) {
-                mouse.getCursorPos((long x, long y, long button) -> System.out.printf("x: %s, y: %s, button: %s\n", x, y, button));
             }
         }
 
@@ -78,6 +98,11 @@ public class Test {
 
             x = Long.parseLong(pointX);
             y = Long.parseLong(pointY);
+        }
+
+        Point(long x, long y) {
+            this.x = x;
+            this.y = y;
         }
 
         public long getX() {
