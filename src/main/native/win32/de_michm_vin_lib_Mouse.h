@@ -31,11 +31,19 @@ JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_move
 
 /*
  * Class:     de_michm_vin_lib_Mouse
- * Method:    moveTo
+ * Method:    moveAbs
  * Signature: (JJ)V
  */
-JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_moveTo
+JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_moveAbs
   (JNIEnv *, jobject, jlong, jlong);
+
+/*
+ * Class:     de_michm_vin_lib_Mouse
+ * Method:    moveTo
+ * Signature: (JJF)V
+ */
+JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_moveTo
+  (JNIEnv *, jobject, jlong, jlong, jfloat);
 
 /*
  * Class:     de_michm_vin_lib_Mouse
@@ -44,6 +52,30 @@ JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_moveTo
  */
 JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_nativeClick
   (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     de_michm_vin_lib_Mouse
+ * Method:    getCursorPos
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_getCursorPos
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     de_michm_vin_lib_Mouse
+ * Method:    hook
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_hook
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     de_michm_vin_lib_Mouse
+ * Method:    unhook
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_unhook
+  (JNIEnv *, jobject);
 
 #ifdef __cplusplus
 }
