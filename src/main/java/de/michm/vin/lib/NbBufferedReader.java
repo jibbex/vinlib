@@ -2,6 +2,8 @@ package de.michm.vin.lib;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -12,7 +14,8 @@ public class NbBufferedReader {
     private volatile boolean ready = false;
     private Thread backgroundThread;
 
-    public NbBufferedReader(final BufferedReader reader) {
+    public NbBufferedReader(final InputStream in) {
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         backgroundThread = new Thread(() -> {
             try {
                 while (!Thread.interrupted()) {

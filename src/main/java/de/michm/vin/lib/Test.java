@@ -13,8 +13,7 @@ public class Test {
         boolean abs = false;
         boolean pos = false;
         boolean isIndicating = false;
-        final BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-        final NbBufferedReader reader = new NbBufferedReader(stdin);
+        final NbBufferedReader reader = new NbBufferedReader(System.in);
         AtomicReference<Point> oldPt = new AtomicReference<>(new Point(-1,1));
         AtomicReference<Point> pt = new AtomicReference<>(new Point(-1, -1));
 
