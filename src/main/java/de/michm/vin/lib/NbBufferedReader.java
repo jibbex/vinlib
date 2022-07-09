@@ -16,6 +16,7 @@ public class NbBufferedReader {
 
     public NbBufferedReader(final InputStream in) {
         final BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
         backgroundThread = new Thread(() -> {
             try {
                 while (!Thread.interrupted()) {
