@@ -180,7 +180,7 @@ public class Mouse {
      * @param y
      * @param button
      */
-    protected void event(long x, long y, long button) {
+    protected void event(long x, long y, long button) throws InterruptedException {
         proc.callback(x, y, button);
     }
 }
