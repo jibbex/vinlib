@@ -1,18 +1,21 @@
 package de.michm.vin.lib;
 
 import java.io.IOException;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Test {
-    public static void main(String[] args) throws  IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         Thread thread = null;
         boolean run = true;
         boolean abs = false;
         boolean pos = false;
         boolean isIndicating = false;
         final NbBufferedReader reader = new NbBufferedReader(System.in);
-        AtomicReference<Point> oldPt = new AtomicReference<>(new Point(-1,1));
         AtomicReference<Point> pt = new AtomicReference<>(new Point(-1, -1));
+        BlockingDeque<String> outBuffer = new LinkedBlockingDeque<>();
 
         String input = null;
         Mouse mouse = new Mouse();
@@ -29,7 +32,7 @@ public class Test {
             if (input != null) {
                 isIndicating = false;
 
-                if (input.equalsIgnoreCase("q")) {
+                if (input.equals("q") || input.equals("quit")) {
                     run = false;
                 } else if (!abs && input.matches("^-?\\d+, ?-?\\d+$")) {
                     Point point = new Point(input);
@@ -54,41 +57,35 @@ public class Test {
                     System.out.printf("abs: %s\n", abs);
                 } else if (input.equals("pos") || input.equals("p")) {
                     pos = !pos;
-
-                    if (pos) {
-                        thread = new Thread(() -> {
-                            while (true) {
-                                mouse.getCursorPos((long x, long y, long button) -> {
-                                    try {
-                                        pt.set(new Point(x, y));
-                                        Thread.sleep(250);
-                                    } catch (Exception e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                });
-                            }
-                        });
-
-                        thread.setDaemon(true);
-                        thread.start();
-                    }
                 } else if (input.equals("help")) {
                     printHelp();
                 }
             }
 
-            boolean hasChanged = oldPt.get().getX() != pt.get().getX() || oldPt.get().getY() != pt.get().getY();
-
-            if (hasChanged && pt.get().getX() != -1 && pt.get().getY() != -1) {
-                System.out.printf("x: %s, y: %s\n", pt.get().getX(), pt.get().getY());
-                oldPt.set(pt.get());
+            if (input != null && input.isEmpty() && pos) {
+                pos = false;
             }
 
-            if (thread != null && input != null && input.isEmpty()) {
-                pos = false;
-                thread.interrupt();
-                thread = null;
-                pt.set(new Point(-1,-1));
+            if (pos) {
+                mouse.getCursorPos((long x, long y, long button) -> {
+                    try {
+                        boolean hasChanged = x != pt.get().getX() || y != pt.get().getY();
+
+                        if (hasChanged) {
+                            pt.set(new Point(x, y));
+                            outBuffer.add(String.format("x: %s, y: %s\n", x, y));
+                        }
+
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            }
+
+            if (!outBuffer.isEmpty()) {
+                String out = outBuffer.poll(50L, TimeUnit.MILLISECONDS);
+                System.out.print(out);
+                isIndicating = false;
             }
         }
 
@@ -102,7 +99,9 @@ public class Test {
         System.out.println("specified mouse button.\n");
         System.out.println("Enter abs <true|false> to toggle move mode");
         System.out.println("between absolute to screen size and relative to position.\n");
-        System.out.println("Hit \"q\" to quit.\n");
+        System.out.println("Enter pos to receive system mouse cursor position.");
+        System.out.println("Hit enter to unhook.\n");
+        System.out.println("Enter quit or hit \"q\" to quit.\n");
     }
 
     private static class Point {
