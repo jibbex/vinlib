@@ -3,6 +3,7 @@ package de.michm.vin.lib;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Test {
@@ -11,8 +12,10 @@ public class Test {
         boolean run = true;
         boolean abs = false;
         boolean pos = false;
+        boolean isIndicating = false;
         final BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
         final NbBufferedReader reader = new NbBufferedReader(stdin);
+        AtomicReference<Point> oldPt = new AtomicReference<>(new Point(-1,1));
         AtomicReference<Point> pt = new AtomicReference<>(new Point(-1, -1));
 
         String input = null;
@@ -21,9 +24,15 @@ public class Test {
         printHelp();
 
         while (run) {
+            if (!isIndicating) {
+                isIndicating = true;
+                System.out.print("> ");
+            }
             input = reader.readLine();
 
             if (input != null) {
+                isIndicating = false;
+
                 if (input.equalsIgnoreCase("q")) {
                     run = false;
                 } else if (!abs && input.matches("^-?\\d+, ?-?\\d+$")) {
@@ -53,30 +62,37 @@ public class Test {
                     if (pos) {
                         thread = new Thread(() -> {
                             while (true) {
-                                try {
-                                    mouse.getCursorPos((long x, long y, long button) -> {
+                                mouse.getCursorPos((long x, long y, long button) -> {
+                                    try {
                                         pt.set(new Point(x, y));
-                                    });
-                                    Thread.sleep(500);
-                                } catch (InterruptedException e) {
-                                    throw new RuntimeException(e);
-                                }
+                                        Thread.sleep(250);
+                                    } catch (Exception e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                });
                             }
-
                         });
 
                         thread.setDaemon(true);
                         thread.start();
-                    } else if (thread != null) {
-                        thread.interrupt();
-                        thread = null;
-                        pt.set(new Point(-1,-1));
                     }
+                } else if (input.equals("help")) {
+                    printHelp();
                 }
             }
 
-            if (pt.get().getX() != -1 && pt.get().getY() != -1) {
+            boolean hasChanged = oldPt.get().getX() != pt.get().getX() || oldPt.get().getY() != pt.get().getY();
+
+            if (hasChanged && pt.get().getX() != -1 && pt.get().getY() != -1) {
                 System.out.printf("x: %s, y: %s\n", pt.get().getX(), pt.get().getY());
+                oldPt.set(pt.get());
+            }
+
+            if (thread != null && input != null && input.isEmpty()) {
+                pos = false;
+                thread.interrupt();
+                thread = null;
+                pt.set(new Point(-1,-1));
             }
         }
 
