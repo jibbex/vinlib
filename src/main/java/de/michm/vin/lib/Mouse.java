@@ -1,17 +1,35 @@
 package de.michm.vin.lib;
-
+// We need to get the screen resolution later.
 import java.awt.*;
 
-public class Mouse {
+public class Mouse {    
+    /*
+        The duration after which the state will switch 
+        from down to up.
+    */
     final private static int CLICK_DURATION = 300;
+
+    /*
+        These constants are flags that are passed when 
+        calling the Windows API function SendInput().
+    */
     final public static long LEFT_DOWN = 0x0002;
     final public static long LEFT_UP = 0x0004;
     final public static long RIGHT_DOWN = 0x0008;
     final public static long RIGHT_UP = 0x0010;
     final public static long MIDDLE_DOWN = 0x0020;
     final public static long MIDDLE_UP = 0x0040;
+
+    /*
+        A callback method. It will be called from
+        the shared library after getting the mouse
+        coordinates.
+    */
     private MouseWinProc proc;
 
+    /*
+        Loads vinlib.dll
+    */
     static {
         System.loadLibrary("vinlib");
     }
@@ -53,43 +71,6 @@ public class Mouse {
         x = Math.round(MAX_SIZE * factorX);
         y = Math.round(MAX_SIZE * factorY);
         moveAbs(x, y);
-    }
-
-    protected void moveABS(long x, long y, long speed) {
-        final long MAX_SIZE = 0xFFFF;
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        double width = screenSize.getWidth();
-        double height = screenSize.getHeight();
-        long pos[] = new long[2];
-        long finalX = x;
-        long finalY = y;
-
-        while (pos[0] != x && pos[1] != y) {
-            getCursorPos((long xPos, long yPos, long button) ->{
-                try {
-                    if (xPos > finalX) {
-                        pos[0] = xPos + 1;
-                    } else if (xPos < finalX) {
-                        pos[0] = xPos - 1;
-                    }
-
-                    if (yPos < finalY) {
-                        pos[1] = yPos + 1;
-                    } else if (yPos > finalY) {
-                        pos[1] = yPos - 1;
-                    }
-
-                    double factorX = x / width;
-                    double factorY = y / height;
-
-                    moveAbs(Math.round(MAX_SIZE * factorX), Math.round(MAX_SIZE * factorY));
-
-                    Thread.sleep(speed);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            });
-        }
     }
 
     /**
@@ -136,7 +117,7 @@ public class Mouse {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    };
+    }
 
     /**
      * Sends click event to the operating system.
@@ -173,7 +154,7 @@ public class Mouse {
      * Unhooks callback from the low level mouse hook.
      */
     protected native void unhook();
-
+    
     /**
      * Is called from native context.
      * @param x
