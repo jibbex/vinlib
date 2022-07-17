@@ -128,18 +128,23 @@ public class Mouse {
      */
     private native void nativeClick(long button);
 
+    @Deprecated
     protected void getCursorPos(MouseWinProc proc) {
         this.proc = proc;
         getCursorPos();
     }
 
+    @Deprecated
     private native void getCursorPos();
+
+    protected native Point nativeGetCursorPos();
 
     /**
      * Creates a low level mouse hook. The callback will
      * be called if a message was received.
      * @param proc
-     */
+     */.
+    @Deprecated
     protected void hook(MouseWinProc proc) {
         this.proc = proc;
         hook();
@@ -148,11 +153,13 @@ public class Mouse {
     /**
      * Creates a low level mouse hook.
      */
+    @Deprecated
     private native void hook();
 
     /**
      * Unhooks callback from the low level mouse hook.
      */
+    @Deprecated
     protected native void unhook();
     
     /**
@@ -161,6 +168,7 @@ public class Mouse {
      * @param y
      * @param button
      */
+    @Deprecated
     protected void event(long x, long y, long button) throws InterruptedException {
         proc.callback(x, y, button);
     }

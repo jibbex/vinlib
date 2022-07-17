@@ -63,6 +63,14 @@ JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_getCursorPos
 
 /*
  * Class:     de_michm_vin_lib_Mouse
+ * Method:    nativeGetCursorPos
+ * Signature: ()Lde/michm/vin/lib/Point;
+ */
+JNIEXPORT jobject JNICALL Java_de_michm_vin_lib_Mouse_nativeGetCursorPos
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     de_michm_vin_lib_Mouse
  * Method:    hook
  * Signature: ()V
  */

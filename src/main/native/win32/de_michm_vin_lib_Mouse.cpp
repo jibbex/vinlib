@@ -100,3 +100,18 @@ JNIEXPORT void JNICALL Java_de_michm_vin_lib_Mouse_getCursorPos(JNIEnv *env, job
         (*env).CallVoidMethod(obj,callback,(jlong) pt->x, (jlong) pt->y, (jlong) -1);
     }
 }
+
+JNIEXPORT jobject JNICALL Java_de_michm_vin_lib_Mouse_nativeGetCursorPos(JNIEnv *env, jobject obj) {
+    LPPOINT pt;
+    jlong x = -1;
+    jlong y = -1;
+    jclass pointClass = env->FindClass("de/michm/vin/lib/Point");
+    jmethodID jconstructor = env->GetMethodID(pointClass, "<init>", "(JJ)V");
+
+    if (GetCursorPos(pt)) {
+        x = (jlong) pt->x;
+        y = (jlong) pt->y;
+    }
+
+    return env->NewObject(pointClass, jconstructor, x, y);
+}

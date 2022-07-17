@@ -67,7 +67,16 @@ public class Test {
             }
 
             if (pos) {
-                mouse.getCursorPos((long x, long y, long button) -> {
+                Point mousePoint = mouse.nativeGetCursorPos();
+                boolean hasChanged = mousePoint.getX() != pt.get().getX() || mousePoint.getY() != pt.get().getY();
+
+                if (hasChanged) {
+                    System.out.println(String.format("x: %s, y: %s", mousePoint.getX(), mousePoint.getY()));
+                    isIndicating = false;
+                    //pt.set(mousePoint);
+                    //outBuffer.add(String.format("x: %s, y: %s\n", mousePoint.getX(), mousePoint.getY()));
+                }
+                /*mouse.getCursorPos((long x, long y, long button) -> {
                     try {
                         boolean hasChanged = x != pt.get().getX() || y != pt.get().getY();
 
@@ -79,14 +88,14 @@ public class Test {
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
-                });
+                });*/
             }
 
-            if (!outBuffer.isEmpty()) {
-                String out = outBuffer.poll(50L, TimeUnit.MILLISECONDS);
-                System.out.print(out);
-                isIndicating = false;
-            }
+            //if (!outBuffer.isEmpty()) {
+             //   String out = outBuffer.poll(250L, TimeUnit.NANOSECONDS);
+             //   System.out.print(out);
+             //   isIndicating = false;
+            //}
         }
 
         reader.close();
@@ -102,33 +111,5 @@ public class Test {
         System.out.println("Enter pos to receive system mouse cursor position.");
         System.out.println("Hit enter to unhook.\n");
         System.out.println("Enter quit or hit \"q\" to quit.\n");
-    }
-
-    private static class Point {
-        private final long x;
-        private final long y;
-
-        Point(String cords) {
-            cords = cords.replace(", ", ",");
-
-            int separatorIndex = cords.indexOf(',');
-            String pointX = cords.substring(0, separatorIndex);
-            String pointY = cords.substring(separatorIndex + 1);
-
-            x = Long.parseLong(pointX);
-            y = Long.parseLong(pointY);
-        }
-
-        Point(long x, long y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public long getX() {
-            return x;
-        }
-        public long getY() {
-            return y;
-        }
     }
 }
