@@ -41,7 +41,7 @@ public class NbBufferedReader {
 
     public String readLine() throws IOException {
         try {
-            return closed && lines.isEmpty() ? null : lines.poll(500L, TimeUnit.MILLISECONDS);
+            return closed && lines.isEmpty() ? null : lines.poll(100L, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             throw new IOException("The BackgroundReaderThread was interrupted!", e);
         }

@@ -1,21 +1,15 @@
 package de.michm.vin.lib;
 
 import java.io.IOException;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class Test {
-    public static void main(String[] args) throws IOException, InterruptedException {
-        Thread thread = null;
+    public static void main(String[] args) throws IOException {
         boolean run = true;
         boolean abs = false;
         boolean pos = false;
         boolean isIndicating = false;
         final NbBufferedReader reader = new NbBufferedReader(System.in);
-        AtomicReference<Point> pt = new AtomicReference<>(new Point(-1, -1));
-        BlockingDeque<String> outBuffer = new LinkedBlockingDeque<>();
+        Point pt = new Point(-1, -1);
 
         String input = null;
         Mouse mouse = new Mouse();
@@ -27,6 +21,7 @@ public class Test {
                 isIndicating = true;
                 System.out.print("> ");
             }
+
             input = reader.readLine();
 
             if (input != null) {
@@ -37,24 +32,23 @@ public class Test {
                 } else if (!abs && input.matches("^-?\\d+, ?-?\\d+$")) {
                     Point point = new Point(input);
                     mouse.move(point.getX(), point.getY());
-                    //mouse.moveTo(point.getX(), point.getY(), 1f);
                 } else if (abs && input.matches("^-?\\d+, ?-?\\d+$")) {
                     Point point = new Point(input);
-                    mouse.moveABS(point.getX(), point.getY());
-                } else if (input.matches("^click .+$") || input.equalsIgnoreCase("click")) {
+                    mouse.moveAbs(point.getX(), point.getY());
+                } else if (input.matches("^click .+$") || input.equals("click")) {
                     String btnIn = input.substring(input.indexOf(' ') + 1);
 
-                    if (btnIn.equalsIgnoreCase("left") || btnIn.equalsIgnoreCase("click")) {
+                    if (btnIn.equals("left") || btnIn.equals("click")) {
                         mouse.click();
-                    } else if (btnIn.equalsIgnoreCase("right")) {
+                    } else if (btnIn.equals("right")) {
                         mouse.click(Mouse.RIGHT_DOWN);
-                    } else if (btnIn.equalsIgnoreCase("middle")) {
+                    } else if (btnIn.equals("middle")) {
                         mouse.click(Mouse.MIDDLE_DOWN);
                     }
-                } else if (input.toLowerCase().startsWith("abs ")) {
-                    abs = input.toLowerCase().endsWith(" true");
-                } else if (input.equalsIgnoreCase("abs")) {
-                    System.out.printf("abs: %s\n", abs);
+                } else if (input.startsWith("abs ")) {
+                    abs = input.endsWith(" true");
+                } else if (input.equals("abs")) {
+                    System.out.printf("> abs: %s\n", abs);
                 } else if (input.equals("pos") || input.equals("p")) {
                     pos = !pos;
                 } else if (input.equals("help")) {
@@ -64,38 +58,17 @@ public class Test {
 
             if (input != null && input.isEmpty() && pos) {
                 pos = false;
-            }
-
-            if (pos) {
+            } else if (pos) {
                 Point mousePoint = mouse.nativeGetCursorPos();
-                boolean hasChanged = mousePoint.getX() != pt.get().getX() || mousePoint.getY() != pt.get().getY();
+                boolean hasChanged = mousePoint.getX() != pt.getX() || mousePoint.getY() != pt.getY();
 
                 if (hasChanged) {
                     System.out.println(String.format("x: %s, y: %s", mousePoint.getX(), mousePoint.getY()));
                     isIndicating = false;
-                    //pt.set(mousePoint);
-                    //outBuffer.add(String.format("x: %s, y: %s\n", mousePoint.getX(), mousePoint.getY()));
+                    pt = mousePoint.clone();
                 }
-                /*mouse.getCursorPos((long x, long y, long button) -> {
-                    try {
-                        boolean hasChanged = x != pt.get().getX() || y != pt.get().getY();
 
-                        if (hasChanged) {
-                            pt.set(new Point(x, y));
-                            outBuffer.add(String.format("x: %s, y: %s\n", x, y));
-                        }
-
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                });*/
             }
-
-            //if (!outBuffer.isEmpty()) {
-             //   String out = outBuffer.poll(250L, TimeUnit.NANOSECONDS);
-             //   System.out.print(out);
-             //   isIndicating = false;
-            //}
         }
 
         reader.close();
@@ -113,3 +86,5 @@ public class Test {
         System.out.println("Enter quit or hit \"q\" to quit.\n");
     }
 }
+
+

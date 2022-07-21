@@ -26,4 +26,9 @@ public class Point {
     public long getY() {
         return y;
     }
+
+    @Override
+    public Point clone() {
+        return new Point(this.x, this.y);
+    }
 }

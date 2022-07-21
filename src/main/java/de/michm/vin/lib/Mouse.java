@@ -21,13 +21,6 @@ public class Mouse {
     final public static long MIDDLE_UP = 0x0040;
 
     /*
-        A callback method. It will be called from
-        the shared library after getting the mouse
-        coordinates.
-    */
-    private MouseWinProc proc;
-
-    /*
         Loads vinlib.dll
     */
     static {
@@ -44,23 +37,11 @@ public class Mouse {
 
     /**
      * Moves the mouse cursor absolute to the
-     * screen size along x and y-axis. Interpolates
-     * the values between start- and endpoint.
-     * @param x long value of x-axis position
-     * @param y long value of y-axis position
-     * @param speed float value of movement speed
-     */
-    protected void move(long x, long y, float speed) {
-        moveTo(x, y, speed);
-    }
-
-    /**
-     * Moves the mouse cursor absolute to the
      * screen size along x and y-axis.
      * @param x long value of x-axis position
      * @param y long value of y-axis position
      */
-    protected void moveABS(long x, long y) {
+    protected void moveAbs(long x, long y) {
         final long MAX_SIZE = 0xFFFF;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         double width = screenSize.getWidth();
@@ -70,7 +51,7 @@ public class Mouse {
 
         x = Math.round(MAX_SIZE * factorX);
         y = Math.round(MAX_SIZE * factorY);
-        moveAbs(x, y);
+        nativeMoveAbs(x, y);
     }
 
     /**
@@ -79,17 +60,7 @@ public class Mouse {
      * @param x long value of x-axis position
      * @param y long value of y-axis position
      */
-    private native void moveAbs(long x, long y);
-
-    /**
-     * Moves the mouse cursor absolute to the
-     * screen size along x and y-axis. Interpolates
-     * the values between start- and endpoint.
-     * @param x long value of x-axis position
-     * @param y long value of y-axis position
-     * @param speed float value of movement speed
-     */
-    protected native void moveTo(long x, long y, float speed);
+    private native void nativeMoveAbs(long x, long y);
 
     /**
      * Sends left click event to the operating system.
@@ -128,48 +99,10 @@ public class Mouse {
      */
     private native void nativeClick(long button);
 
-    @Deprecated
-    protected void getCursorPos(MouseWinProc proc) {
-        this.proc = proc;
-        getCursorPos();
-    }
-
-    @Deprecated
-    private native void getCursorPos();
-
+    /**
+     * Calls the winapi function GetCursorPos()
+     * and wraps it result into a new Point Object.
+     * @return a Point object with cursor coordinates
+     */
     protected native Point nativeGetCursorPos();
-
-    /**
-     * Creates a low level mouse hook. The callback will
-     * be called if a message was received.
-     * @param proc
-     */.
-    @Deprecated
-    protected void hook(MouseWinProc proc) {
-        this.proc = proc;
-        hook();
-    }
-
-    /**
-     * Creates a low level mouse hook.
-     */
-    @Deprecated
-    private native void hook();
-
-    /**
-     * Unhooks callback from the low level mouse hook.
-     */
-    @Deprecated
-    protected native void unhook();
-    
-    /**
-     * Is called from native context.
-     * @param x
-     * @param y
-     * @param button
-     */
-    @Deprecated
-    protected void event(long x, long y, long button) throws InterruptedException {
-        proc.callback(x, y, button);
-    }
 }
