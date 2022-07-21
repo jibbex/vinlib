@@ -14,6 +14,11 @@ public class NbBufferedReader {
     private volatile boolean ready = false;
     private Thread backgroundThread;
 
+    /**
+     * Creates a new NbBufferedReader object.
+     *
+     * @param in InputStream
+     */
     public NbBufferedReader(final InputStream in) {
         final BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
@@ -39,6 +44,14 @@ public class NbBufferedReader {
         backgroundThread.start();
     }
 
+    /**
+     * Retrieves and removes the first line of
+     * the internal queue. Returns null if the
+     * queue is empty or the reader is closed.
+     *
+     * @return String first line of the queue
+     * @throws IOException
+     */
     public String readLine() throws IOException {
         try {
             return closed && lines.isEmpty() ? null : lines.poll(100L, TimeUnit.MILLISECONDS);
@@ -47,6 +60,10 @@ public class NbBufferedReader {
         }
     }
 
+    /**
+     * Closes the BufferedReader
+     *
+     */
     public void close() {
         if (backgroundThread != null) {
             backgroundThread.interrupt();
@@ -54,6 +71,11 @@ public class NbBufferedReader {
         }
     }
 
+    /**
+     * Returns ready state
+     *
+     * @return boolean ready
+     */
     public boolean isReady() {
         return ready;
     }
